@@ -22,9 +22,10 @@ let displayItems = [];
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/bidHub").build();
 
-// Disable the send button until connection is established.
+// Disable the join button until connection is established.
 document.getElementById("joinButton").disabled = true;
 
+// Function to receive information about a bid placed on one of the item
 connection.on("ReceiveBid", function (message) {
     // Update the item that got a new bid
     var idx = items.findIndex((i) => i.itemId == message.itemId);
@@ -38,6 +39,7 @@ connection.on("ReceiveBid", function (message) {
     redrawItems(items);
 });
 
+// Function to receive a full sync of items
 connection.on("ReceiveSync", function (message) {
     myBidderId = message.bidderId;
     myBidderName = message.bidderName;
@@ -45,12 +47,15 @@ connection.on("ReceiveSync", function (message) {
     redrawItems(items);
 });
 
+// Handle a completed connection
+// - Enable the join button
 connection.start().then(function () {
     document.getElementById("joinButton").disabled = false;
 }).catch(function (err) {
     return console.error(err.toString());
 });
 
+// Listener for the join button
 document.getElementById("joinButton").addEventListener("click", function (event) {
     var name = document.getElementById("nameInput").value;
     if (myBidderId == -1) {
@@ -67,6 +72,9 @@ document.getElementById("joinButton").addEventListener("click", function (event)
     }
 });
 
+// Redraw the list of items
+// This will happen when a full sync is received
+// or a bid is received
 function redrawItems() {
     console.log('redrawItems()');
     // Cancel existing timers
@@ -143,16 +151,4 @@ function redrawItems() {
             event.preventDefault();
         });
     });
-}
-
-function selectItem(itemId) {
-    var idx = items.findIndex((i) => i.itemId == itemId);
-    if (idx != -1) {
-        var elSelectedItemId = document.getElementById("selectedItemId");
-        elSelectedItemId.value = items[idx].itemId;
-        var elSelectedItemName = document.getElementById("selectedItemName");
-        elSelectedItemName.value = items[idx].name;
-        var elBidAmount = document.getElementById("bidAmount");
-        elBidAmount.value = items[idx].currentBid;
-    }
 }
