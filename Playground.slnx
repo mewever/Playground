@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="LinkedList/LinkedList.csproj" />
+  <Project Path="SignalRAuction/SignalRAuction.csproj" Id="607bcf6d-e4a3-4cbe-b432-b3dbd54272e3" />
 </Solution>
