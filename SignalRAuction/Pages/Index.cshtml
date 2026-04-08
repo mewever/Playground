@@ -1,5 +1,14 @@
 ﻿@page
 <div class="container">
+    <div class="row alert alert-info p-1">
+        This is a client for an online real-time auction based on SignalR.
+        The items in the list will disappear as their closing time passes.
+        If multiple people join at once, their bidding activity will show up
+        on everyone's pages in real time.
+        Whenever a bid is placed and there is less than a minute left for the item,
+        the item's bidding time will be extended for one minute to allow a chance
+        for counter-bids.
+    </div>
     <div class="row p-1">
         <div class="col-1">Your Name</div>
         <div class="col-5"><input type="text" id="nameInput" /></div>

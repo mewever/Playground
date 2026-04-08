@@ -27,6 +27,7 @@ document.getElementById("joinButton").disabled = true;
 
 // Function to receive information about a bid placed on one of the item
 connection.on("ReceiveBid", function (message) {
+    console.log(`Bid update received for item ID ${message.itemId} for ${message.currentBid}`)
     // Update the item that got a new bid
     var idx = items.findIndex((i) => i.itemId == message.itemId);
     if (idx == -1) {
@@ -41,6 +42,7 @@ connection.on("ReceiveBid", function (message) {
 
 // Function to receive a full sync of items
 connection.on("ReceiveSync", function (message) {
+    console.log('Full sync received')
     myBidderId = message.bidderId;
     myBidderName = message.bidderName;
     items = message.items;
@@ -76,7 +78,6 @@ document.getElementById("joinButton").addEventListener("click", function (event)
 // This will happen when a full sync is received
 // or a bid is received
 function redrawItems() {
-    console.log('redrawItems()');
     // Cancel existing timers
     for (item of displayItems) {
         if (item.timer) {
@@ -90,20 +91,16 @@ function redrawItems() {
     }
 
     // Set display items to items sorted by ascending closing time
-    console.log('Sorting items...');
     displayItems = items.sort((a, b) => new Date(a.closingTime) - new Date(b.closingTime));
-    console.log('Items sorted.');
 
     var el = document.getElementById("itemsDisplay");
     var itemsList = '<div class="row">';
     displayItems.forEach(item => {
-        console.log(`Redrawing item ${item.itemId}`);
         var divId = `item_${item.id}`;
         var bidAmountId = `bidAmount_${item.itemId}`;
         var bidButtonId = `bidButton_${item.itemId}`;
         var closeTime = new Date(item.closingTime);
         var millisecondsBeforeClose = closeTime - Date.now();
-        console.log(`closing in ${millisecondsBeforeClose} ms`);
         // Only display items that close in the future
         if (millisecondsBeforeClose > 0) {
             itemsList += `<div id="${divId}" class="col-12 col-sm-6 col-md-4 p-1">`
@@ -121,34 +118,50 @@ function redrawItems() {
             itemsList += '</div>';
 
             // Set a timer to remove the item after it closes
-            console.log(`Setting timer for item ${item.itemId}`);
+            console.log(`Setting removal timer for item ${item.itemId}`);
             item.timer = setTimeout(() => {
-                el = document.getElementById(divId).remove();
+                el = document.getElementById(divId);
+                if (el) {
+                    el.remove();
+                }
             }, millisecondsBeforeClose);
         }
     });
     itemsList += '</div>';
-    console.log('Setting HTML');
     el.innerHTML = itemsList;
 
     // Set the bid button listeners (can't be done until the inner HTML has been set)
     displayItems.forEach(item => {
-        // Set a listener for the submit bid button
-        console.log(`Setting submit button listener for item ${item.itemId}`);
-        var bidAmountId = `bidAmount_${item.itemId}`;
-        var bidButtonId = `bidButton_${item.itemId}`;
-        item.buttonListener = document.getElementById(bidButtonId).addEventListener("click", function (event) {
-            var amount = document.getElementById(bidAmountId).value;
-            var request = {
-                bidderId: Number(myBidderId),
-                itemId: Number(item.itemId),
-                bidAmount: Number(amount)
-            };
-            console.log(JSON.stringify(request));
-            connection.invoke("SubmitBid", request).catch(function (err) {
-                return console.error(err.toString());
-            });
-            event.preventDefault();
-        });
+        // Use a try/catch here so the rest of the items get processed if this one gets an error
+        // Errors might occur if the item is removed by its timer while this loop is occurring
+        try {
+            // Set a listener for the submit bid button
+            var bidAmountId = `bidAmount_${item.itemId}`;
+            var bidButtonId = `bidButton_${item.itemId}`;
+            var el = document.getElementById(bidButtonId);
+            if (el) {
+                console.log(`Setting submit button listener for item ${item.itemId}`);
+                item.buttonListener = el.addEventListener("click", function (event) {
+                    var amountEl = document.getElementById(bidAmountId);
+                    if (amountEl) {
+                        var amount = amountEl.value;
+                        var request = {
+                            bidderId: Number(myBidderId),
+                            itemId: Number(item.itemId),
+                            bidAmount: Number(amount)
+                        };
+                        console.log(`Submitting bid for item ID ${item.itemId} for ${amount}`);
+                        connection.invoke("SubmitBid", request).catch(function (err) {
+                            return console.error(err.toString());
+                        });
+                    }
+                    event.preventDefault();
+                });
+            }
+        }
+        catch (err) {
+            // Log the error and continue on
+            console.error(err.toString())
+        }
     });
 }
