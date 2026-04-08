@@ -66,9 +66,15 @@ connection.start().then(function () {
 document.getElementById("joinButton").addEventListener("click", function (event) {
     var name = document.getElementById("nameInput").value;
     if (myBidderId == -1) {
-        connection.invoke("ConnectBidder", name).catch(function (err) {
-            return console.error(err.toString());
-        });
+        connection.invoke("ConnectBidder", name)
+            .then(function () {
+                // Disable the name input and hide the join button after they have joined
+                document.getElementById("nameInput").disabled = true;
+                document.getElementById("joinButton").hidden = true;
+            })
+            .catch(function (err) {
+                return console.error(err.toString());
+            });
         event.preventDefault();
     }
     else {

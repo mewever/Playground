@@ -107,7 +107,7 @@ namespace SignalRAuction.Services
                 {
                     Id = 1,
                     Name = "Beans",
-                    Description = "Twenty or so greenbean seeds in a cloth pouch. Magical properties have not been verified.",
+                    Description = "Twenty or so greenbean seeds in a cloth pouch. Magical properties have not been tested.",
                     StartingBid = 1,
                     CurrentBid = 1,
                     ClosingTime = DateTime.UtcNow.AddMinutes(1),
@@ -127,7 +127,7 @@ namespace SignalRAuction.Services
                 {
                     Id = 3,
                     Name = "Rags",
-                    Description = "Approximately 100 assorted washrags, hand towels and rags in various conditions.",
+                    Description = "Approximately 100 assorted washcloths, hand towels and rags in various conditions.",
                     StartingBid = 1,
                     CurrentBid = 1,
                     ClosingTime = DateTime.UtcNow.AddMinutes(4),
