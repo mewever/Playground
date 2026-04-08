@@ -11,5 +11,6 @@ namespace SignalRAuction.Services
         public bool UpdateItem(Item item);
         public bool DeleteItem(int itemId);
         public BidResponse PlaceBid(int itemId, int userId, decimal bidAmount);
+        public void Reset();
     }
 }

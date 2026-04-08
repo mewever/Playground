@@ -11,12 +11,22 @@ namespace SignalRAuction.Hubs
         {
             // Create a new bidder and return the ID
             int id = bidderService.AddBidder(name);
+
+            // Initialize the auction if there are no items with closing times in the future
+            var items = itemService.GetAllItems();
+            if (!items.Any(i => i.ClosingTime > DateTime.UtcNow.AddMinutes(1)))
+            {
+                itemService.Reset();
+            }
+
+            // Send a full sync of items to the new bidder
             var syncMessage = GenerateSync(id);
             await Clients.Caller.SendAsync("ReceiveSync", syncMessage);
         }
 
         public async Task ReconnectBidder(int bidderId)
         {
+            // Send a full sync of items to the re-connected bidder
             var syncMessage = GenerateSync(bidderId);
             await Clients.Caller.SendAsync("ReceiveSync", syncMessage);
         }

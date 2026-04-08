@@ -5,12 +5,7 @@ namespace SignalRAuction.Services
 {
     public class ItemService() : IItemService
     {
-        private List<Item> _items = [
-            new Item() { Id = 1, Name = "Item 1", Description = "Item 1", StartingBid = 1, CurrentBid = 1, ClosingTime = DateTime.UtcNow.AddMinutes(1), OriginalClosingTime = DateTime.UtcNow },
-            new Item() { Id = 2, Name = "Item 2", Description = "Item 2", StartingBid = 1, CurrentBid = 1, ClosingTime = DateTime.UtcNow.AddMinutes(2), OriginalClosingTime = DateTime.UtcNow.AddMinutes(1) },
-            new Item() { Id = 3, Name = "Item 3", Description = "Item 3", StartingBid = 1, CurrentBid = 1, ClosingTime = DateTime.UtcNow.AddMinutes(4), OriginalClosingTime = DateTime.UtcNow.AddMinutes(3) },
-            new Item() { Id = 4, Name = "Item 4", Description = "Item 4", StartingBid = 1, CurrentBid = 1, ClosingTime = DateTime.UtcNow.AddMinutes(3), OriginalClosingTime = DateTime.UtcNow.AddMinutes(2) },
-            ];
+        private List<Item> _items = [];
         private List<Bid> _bidHistory = [];
         private int _nextItemId = 1;
         private int _nextBidId = 1;
@@ -103,6 +98,52 @@ namespace SignalRAuction.Services
             }
 
             return new BidResponse { IsSuccessful = true, Message = "Bid placed successfully." };
+        }
+
+        public void Reset()
+        {
+            _items = [
+                new Item()
+                {
+                    Id = 1,
+                    Name = "Beans",
+                    Description = "Twenty or so greenbean seeds in a cloth pouch. Magical properties have not been verified.",
+                    StartingBid = 1,
+                    CurrentBid = 1,
+                    ClosingTime = DateTime.UtcNow.AddMinutes(1),
+                    OriginalClosingTime = DateTime.UtcNow
+                },
+                new Item()
+                {
+                    Id = 2,
+                    Name = "Comic Book",
+                    Description = "Superman #1. For real. We promise this is not a reprint or a bad forgery.",
+                    StartingBid = 1,
+                    CurrentBid = 1,
+                    ClosingTime = DateTime.UtcNow.AddMinutes(2),
+                    OriginalClosingTime = DateTime.UtcNow.AddMinutes(1)
+                },
+                new Item()
+                {
+                    Id = 3,
+                    Name = "Rags",
+                    Description = "Approximately 100 assorted washrags, hand towels and rags in various conditions.",
+                    StartingBid = 1,
+                    CurrentBid = 1,
+                    ClosingTime = DateTime.UtcNow.AddMinutes(4),
+                    OriginalClosingTime = DateTime.UtcNow.AddMinutes(3)
+                },
+                new Item()
+                {
+                    Id = 4,
+                    Name = "New Car",
+                    Description = "A brand new car!",
+                    StartingBid = 1,
+                    CurrentBid = 1,
+                    ClosingTime = DateTime.UtcNow.AddMinutes(3),
+                    OriginalClosingTime = DateTime.UtcNow.AddMinutes(2)
+                },
+            ];
         }
     }
 }

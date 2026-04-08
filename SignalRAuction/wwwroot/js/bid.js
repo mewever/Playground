@@ -22,6 +22,11 @@ let displayItems = [];
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/bidHub").build();
 
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+});
+
 // Disable the join button until connection is established.
 document.getElementById("joinButton").disabled = true;
 
@@ -105,14 +110,16 @@ function redrawItems() {
         if (millisecondsBeforeClose > 0) {
             itemsList += `<div id="${divId}" class="col-12 col-sm-6 col-md-4 p-1">`
                 + '<div class="border border-black p-1">'
-                + `${item.name}<br/>`
+                + `<span class="fw-bold">${item.name}</span><br/>`
                 + `${item.description}<br/>`
-                + `${item.currentBid}<br/>`
+                + `Current Bid: ${currencyFormatter.format(item.currentBid)}<br/>`
                 + `Closes ${closeTime.toLocaleDateString()} ${closeTime.toLocaleTimeString()}`;
-            itemsList += `<br/><input id="${bidAmountId}" value="${item.currentBid}" />`;
-            itemsList += `<br/><button id="${bidButtonId}">Submit Bid</button>`;
+            itemsList += '<div class="d-flex">';
+            itemsList += `<input type="number" id="${bidAmountId}" class="form-control" value="${item.currentBid}" />`;
+            itemsList += `<button id="${bidButtonId}" class="btn btn-primary ">Submit&nbsp;Bid</button>`;
+            itemsList += '</div>';
             if (item.currentWinnerId == myBidderId) {
-                itemsList += '<br\>WINNING';
+                itemsList += '<span class="bg-success text-white px-1">WINNING</span>';
             }
             itemsList += '</div>';
             itemsList += '</div>';
@@ -122,6 +129,7 @@ function redrawItems() {
             item.timer = setTimeout(() => {
                 el = document.getElementById(divId);
                 if (el) {
+                    console.log(`Removing closed item ID ${item.itemId}`)
                     el.remove();
                 }
             }, millisecondsBeforeClose);
