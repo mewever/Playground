@@ -1,0 +1,187 @@
+﻿@using BlazorInvoiceMaker.Components
+@using BlazorInvoiceMaker.Models
+
+@page "/"
+
+<PageTitle>Invoice Maker</PageTitle>
+
+<h1>Invoice Maker</h1>
+
+<div class="alert alert-info">
+    This is an example of a UI for building an invoice, written in Blazor WebAssembly.
+    The layout of the page will adjust automatically for different sized screens.
+</div>
+
+<div class="row px-3">
+    <div class="col-6 col-sm-3 col-md-2 px-0">
+        Invoice Number
+    </div>
+    <div class="col-6 col-sm-3 col-md-2 px-0">
+        <input type="text" class="form-control" @bind-value="invoice.InvoiceNumber" />
+    </div>
+    <div class="col-6 col-sm-3 col-md-2 p-0 ps-sm-2 pe-0">
+        PO / Reference
+    </div>
+    <div class="col-6 col-sm-3 col-md-2 px-0">
+        <input type="text" class="form-control" @bind-value="invoice.ReferenceNumber" />
+    </div>
+</div>
+<div class="row px-3">
+    <div class="col-6 col-sm-3 col-md-2 px-0">
+        Invoice Date
+    </div>
+    <div class="col-6 col-sm-3 col-md-2 px-0">
+        <input type="date" class="form-control" @bind-value="invoice.InvoiceDate" />
+    </div>
+    <div class="col-6 col-sm-3 col-md-2 p-0 ps-sm-2 pe-0">
+        Due Date
+    </div>
+    <div class="col-6 col-sm-3 col-md-2 px-0">
+        <input type="date" class="form-control" @bind-value="invoice.DueDate" />
+    </div>
+</div>
+<div class="row px-3">
+    <div class="col-6 col-sm-3 col-md-2 px-0">
+        Payee
+    </div>
+    <div class="col-6 col-sm-3 col-md-2 px-0">
+        <input type="text" class="form-control" @bind-value="invoice.PayeeName" />
+    </div>
+</div>
+<div class="row px-3">
+    <div class="col-12 col-sm-6 col-md-4 px-0">
+        Bill To
+        <InputTextArea class="form-control" @bind-Value="invoice.BillingAddress" />
+    </div>
+    <div class="col-12 col-sm-6 col-md-4 ps-0 ps-sm-2 pe-0">
+        Ship To
+        <InputTextArea class="form-control" @bind-Value="invoice.ShippingAddress" />
+    </div>
+</div>
+
+<div class="row mt-3 px-3 fw-bold">
+    @* Quantity at beginning of the line on a medium or larger screen *@
+    <div class="d-none d-md-block col-md-2 px-0">
+        Quantity
+    </div>
+    <div class="d-none d-md-block col-8 col-md-6 px-0">
+        Item Description
+    </div>
+    @* Quantity at beginning of second line on a small or smaller screen *@
+    <div class="d-block d-md-none col-4 px-0">
+        Quantity
+    </div>
+    <div class="col-4 col-md-2 px-0">
+        Unit Price
+    </div>
+    <div class="col-4 col-md-2 ps-1 pe-0">
+        Extended Price
+    </div>
+</div>
+
+@foreach(var line in invoice.Lines)
+{
+    <InvoiceLineComponent Line="line" ValueChanged="LineChanged" LineRemoved="LineRemoved" />
+}
+<div class="row px-3">
+    <div class="col-12 px-0">
+        <button type="button" class="btn btn-success w-100" @onclick="AddLine">+</button>
+    </div>
+</div>
+
+<div class="row px-3">
+    <div class="col-8 col-md-10 ps-0 pe-3 text-end">
+        Subtotal
+    </div>
+    <div class="col-4 col-md-2 ps-1 pe-0">
+        @invoice.Subtotal.ToString("C")
+    </div>
+</div>
+<div class="row px-3">
+    <div class="col-8 col-md-10 ps-0 pe-3 text-end">
+        Shipping Fees
+    </div>
+    <div class="col-4 col-md-2 ps-1 pe-0">
+        <MoneyInput Class="form-control" Value="invoice.ShippingFees" ValueChanged="ShippingFeesChanged" />
+    </div>
+</div>
+<div class="row px-3">
+    <div class="col-8 col-md-10 ps-0 pe-3 text-end">
+        Other Fees
+    </div>
+    <div class="col-4 col-md-2 ps-1 pe-0">
+        <MoneyInput Class="form-control" Value="invoice.OtherFees" ValueChanged="OtherFeesChanged" />
+    </div>
+</div>
+<div class="row px-3">
+    <div class="col-8 col-md-10 ps-0 pe-3 text-end">
+        Taxes
+    </div>
+    <div class="col-4 col-md-2 ps-1 pe-0">
+        <MoneyInput Class="form-control" Value="invoice.Taxes" ValueChanged="TaxesChanged" />
+    </div>
+</div>
+<div class="row px-3">
+    <div class="col-8 col-md-10 ps-0 pe-3 text-end fw-bold">
+        TOTAL
+    </div>
+    <div class="col-4 col-md-2 ps-1 pe-0 fw-bold">
+        @invoice.Total.ToString("C")
+    </div>
+</div>
+
+@code {
+    Invoice invoice = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        invoice.Lines.Clear();
+        invoice.Lines.Add(new InvoiceLine());
+    }
+
+    public void AddLine()
+    {
+        invoice.Lines.Add(new InvoiceLine());
+    }
+
+    public async Task LineChanged(InvoiceLine updatedLine)
+    {
+        var line = invoice.Lines.FirstOrDefault(l => l.Id == updatedLine.Id);
+        if (line != null)
+        {
+            line = updatedLine;
+            UpdateSubtotal();
+        }
+    }
+
+    public async Task LineRemoved(int id)
+    {
+        var idx = invoice.Lines.FindIndex(l => l.Id == id);
+        if (idx != -1)
+        {
+            invoice.Lines.RemoveAt(idx);
+            UpdateSubtotal();
+        }
+    }
+
+    private void UpdateSubtotal()
+    {
+        invoice.Subtotal = invoice.Lines.Sum(l => l.ExtendedPrice);
+    }
+
+    public async Task ShippingFeesChanged(decimal newValue)
+    {
+        invoice.ShippingFees = newValue;
+    }
+
+    public async Task OtherFeesChanged(decimal newValue)
+    {
+        invoice.OtherFees = newValue;
+    }
+
+    public async Task TaxesChanged(decimal newValue)
+    {
+        invoice.Taxes = newValue;
+    }
+}

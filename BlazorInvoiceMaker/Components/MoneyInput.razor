@@ -1,0 +1,64 @@
+﻿@using System.Globalization
+@if (ShowCurrencySymbol)
+{
+    <span>@CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol</span>
+}
+<input type="text"
+       value="@StringValue"
+       class="@Class"
+       readonly="@Readonly"
+       style="@Style"
+       placeholder="@Placeholder"
+       @onchange="HandleChange" />
+
+@code {
+    [Parameter]
+    public decimal Value { get; set; }
+    [Parameter]
+    public int DecimalPlaces { get; set; } = 2;
+    [Parameter]
+    public string? Class { get; set; } = null;
+    [Parameter]
+    public bool Readonly { get; set; } = false;
+    [Parameter]
+    public string? Style { get; set; } = null;
+    [Parameter]
+    public string? Placeholder { get; set; } = null;
+    [Parameter]
+    public bool ShowCurrencySymbol { get; set; } = false;
+    [Parameter]
+    public EventCallback<decimal> ValueChanged { get; set; }
+
+    private static string ParsableCharacters = "0123456789-+" + CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
+    private string StringValue = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        StringValue = Value.ToString($"F{DecimalPlaces}");
+    }
+
+    private void HandleChange(ChangeEventArgs e)
+    {
+        string inputValue = e.Value?.ToString() ?? string.Empty;
+        string valueToParse = string.Empty;
+        foreach (char c in inputValue)
+        {
+            if (ParsableCharacters.Contains(c))
+            {
+                valueToParse += c;
+            }
+        }
+        ;
+        if (decimal.TryParse(valueToParse?.ToString(), out var parsedValue))
+        {
+            Value = Math.Round(parsedValue, DecimalPlaces);
+        }
+        else
+        {
+            Value = 0;
+        }
+        ValueChanged.InvokeAsync(Value);
+        StringValue = Value.ToString($"F{DecimalPlaces}");
+    }
+}
