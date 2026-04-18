@@ -1,0 +1,55 @@
+﻿@page
+@model DeleteModel
+@{
+    ViewData["Title"] = "Starship";
+}
+
+<h1 class="display-4">Starship</h1>
+
+<form method="post">
+    <div class="alert alert-danger">
+        <div>
+            Are you sure you want to delete this starship? This cannot be undone.
+        </div>
+        <button type="submit">Delete</button>
+    </div>
+
+    <dl>
+        <dt>@Html.DisplayNameFor(Model => Model.Starship.Name)</dt>
+        <dd>@Html.DisplayFor(Model => Model.Starship.Name)</dd>
+
+        <dt>@Html.DisplayNameFor(Model => Model.Starship.ModelName)</dt>
+        <dd>@Html.DisplayFor(Model => Model.Starship.ModelName)</dd>
+
+        <dt>@Html.DisplayNameFor(Model => Model.Starship.GeneratorName)</dt>
+        <dd>@Html.DisplayFor(Model => Model.Starship.GeneratorName)</dd>
+
+        <dt>@Html.DisplayNameFor(Model => Model.Starship.PowerGeneration)</dt>
+        <dd>@Html.DisplayFor(Model => Model.Starship.PowerGeneration) (Max @Html.DisplayFor(Model => Model.Starship.MaximumPower))</dd>
+    </dl>
+
+    <h2>Mounting Points</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Direction</th>
+                <th>Type</th>
+                <th>Device</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var mountPoint in Model.Starship.MountPoints)
+            {
+                <tr>
+                    <td>@mountPoint.Name</td>
+                    <td>@mountPoint.Direction.ToString()</td>
+                    <td>@(mountPoint.IsTurret ? "Turret" : "Fixed")</td>
+                    <td>
+                        @mountPoint.Device?.Name
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>

@@ -1,0 +1,147 @@
+﻿@page
+@model RazorShipBuilder.Pages.Starships.EditModel
+@{
+    ViewData["Title"] = "Edit Starship";
+}
+
+<h1 class="display-4">Starship</h1>
+
+<form method="post">
+    <dl>
+        <dt><label asp-for="Starship.Name"></label></dt>
+        <dd>
+            <input asp-for="Starship.Name" />
+            <span asp-validation-for="Starship.Name"></span>
+        </dd>
+
+        <dt>@Html.DisplayNameFor(Model => Model.Starship.ModelName)</dt>
+        <dd>@Html.DisplayFor(Model => Model.Starship.ModelName)</dd>
+    </dl>
+
+    <h2>Power Generator</h2>
+    <input type="hidden" asp-for="Starship.GeneratorName" id="generatorName" />
+    <div class="row">
+        @foreach (var generator in Model.GeneratorOptions)
+        {
+            <div class="col-12 col-md-4 col-lg-3 mb-3">
+                <div class="card" onclick="selectGenerator('@generator.Name')">
+                    <div class="card-header" id="cardHeader-gen-@generator.Name">@generator.Name</div>
+                    <div class="card-body">
+                        <div>Generates @generator.PowerGeneration units per second.</div>
+                        <div>Maximum storage of @generator.MaximumPower units.</div>
+                        <div>@generator.Cost credits</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h2>Mounting Points</h2>
+    <div class="row">
+        @for (int i = 0; i < Model.Starship.MountPoints.Count(); i++)
+        {
+            <input type="hidden" asp-for="Starship.MountPoints[i].Id" />
+            <input type="hidden" asp-for="Starship.MountPoints[i].StarshipId" />
+            <input type="hidden" asp-for="Starship.MountPoints[i].Name" />
+            <div class="col-12 col-md-4 col-lg-3 mb-3">
+                <div class="border border-1 h-100">
+                    <div class="fw-bold px-1 py-0 bg-light">@Model.Starship.MountPoints[i].Name</div>
+                    <div class="p-1">
+                        <div>
+                            @Model.Starship.MountPoints[i].Direction.ToString()
+                            @(Model.Starship.MountPoints[i].IsTurret ? "Turret" : "Fixed")
+                        </div>
+                        <select asp-for="Starship.MountPoints[i].MountedDeviceId" id="mountPointId-@i" onchange="mountPointChanged(this, @i)">
+                            <option value="">Empty</option>
+                            @foreach (var option in Model.DeviceOptions)
+                            {
+                                @if (!option.RequiresTurret || Model.Starship.MountPoints[i].IsTurret)
+                                {
+                                    <option value="@option.Id">@option.Name</option>
+                                }
+                            }
+                        </select>
+                        <div id="deviceInfo-@i"></div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div asp-validation-summary="All"></div>
+    <button type="submit">Save</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Device options (JS object provided as a string)
+        @Html.Raw(Model.DeviceOptionsJs)
+
+        // Set the initial selection for the generator
+        const generatorNameEl = document.getElementById('generatorName');
+        selectGenerator(generatorNameEl.value);
+
+        // Set the initial selections for the mount points
+        @for (int i = 0; i < Model.Starship.MountPoints.Count(); i++) {
+            @Html.Raw($"var mountPointEl = document.getElementById('mountPointId-{i}');")
+            @Html.Raw($"mountPointChanged(mountPointEl, {i});")
+        }
+
+        function selectGenerator(generatorName) {
+            // Reset the class for the previous selection
+            var prevSelectedGenerator = document.getElementById('generatorName').value;
+            var e = document.getElementById('cardHeader-gen-' + prevSelectedGenerator);
+            if (e) {
+                e.classList.remove('bg-dark');
+                e.classList.remove('text-light');
+                e.classList.remove('border');
+                e.classList.remove('border-black');
+            }
+            document.getElementById('generatorName').value = generatorName;
+            var e = document.getElementById('cardHeader-gen-' + generatorName);
+            if (e) {
+                e.classList.add('bg-dark');
+                e.classList.add('text-light');
+                e.classList.add('border');
+                e.classList.add('border-black');
+            }
+        }
+
+        function mountPointChanged(element, idx) {
+            const newDeviceId = element.value;
+            const deviceIdx = deviceOptions.findIndex(d => d.id == newDeviceId);
+            const device = deviceOptions[deviceIdx];
+            const e = document.getElementById('deviceInfo-' + idx);
+            if (e) {
+                var dataString = '';
+                if (newDeviceId) {
+                    if (device.isContinualUse) {
+                        dataString += '<div><span class="fw-bold">Power Draw:</span> ' + device.powerDraw + ' per second</div>\n';
+                    }
+                    else {
+                        dataString += '<div><span class="fw-bold">Power Draw:</span> ' + device.powerDraw + ' per use</div>\n';
+                        dataString += '<div><span class="fw-bold">Reload:</span> ' + device.reloadDuration + ' seconds</div>\n';
+                    }
+                    if (device.tractorPower > 0) {
+                        dataString += '<div><span class="fw-bold">Tractor Power:</span> ' + device.tractorPower + '</div>\n';
+                    }
+                    if (device.energyDamage > 0) {
+                        dataString += '<div><span class="fw-bold">Energy Damage:</span> ' + device.energyDamage + '</div>\n';
+                    }
+                    if (device.physicalDamage > 0) {
+                        dataString += '<div><span class="fw-bold">Physical Damage:</span> ' + device.physicalDamage + '</div>\n';
+                    }
+                    if (device.energyShield > 0) {
+                        dataString += '<div><span class="fw-bold">Energy Shield:</span> ' + device.energyShield + '</div>\n';
+                    }
+                    if (device.physicalShield > 0) {
+                        dataString += '<div><span class="fw-bold">Physical Shield:</span> ' + device.physicalShield + '</div>\n';
+                    }
+                }
+                e.innerHTML = dataString;
+            }
+        }
+    </script>
+}

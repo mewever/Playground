@@ -1,5 +1,7 @@
 <Solution>
+  <Project Path="BlazorChart/BlazorChart.csproj" Id="411fbc3a-c097-454d-972c-925e141d836f" />
   <Project Path="BlazorInvoiceMaker/BlazorInvoiceMaker.csproj" Id="c0f60499-41d8-4c7f-ab4e-d065788923b7" />
   <Project Path="LinkedList/LinkedList.csproj" />
+  <Project Path="RazorShipBuilder/RazorShipBuilder.csproj" Id="8ee8f798-788a-4b6c-9fd7-a7b18fff294e" />
   <Project Path="SignalRAuction/SignalRAuction.csproj" Id="607bcf6d-e4a3-4cbe-b432-b3dbd54272e3" />
 </Solution>

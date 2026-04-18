@@ -1,0 +1,86 @@
+﻿@page
+@model AddModel
+@{
+    ViewData["Title"] = "Add Starship";
+}
+
+<h1 class="display-4">Starship</h1>
+
+<form method="post">
+    <dl>
+        <dt><label asp-for="Starship.Name"></label></dt>
+        <dd>
+            <input asp-for="Starship.Name" required />
+            <span asp-validation-for="Starship.Name"></span>
+        </dd>
+
+        <h2>Select the model to build:</h2>
+        <input type="hidden" asp-for="Starship.ModelName" id="modelName" />
+
+        @foreach(var option in Model.ModelOptions)
+            {
+                <div class="card mb-1" onclick="selectModel('@option.Name')">
+                <div class="card-header" id="cardHeader-@option.Name">
+                        @option.Name
+                    </div>
+                    <div class="card-body">
+                        <div>Hull cost: @option.HullCost credits</div>
+                        <h3>Power Options</h3>
+                        <div class="row">
+                            @foreach(var generator in option.GeneratorOptions)
+                            {
+                                <div class="col-12 col-md-4 col-lg-3">
+                                    <div class="fw-bold">@generator.Name</div>
+                                    <div>Generates @generator.PowerGeneration units per second.</div>
+                                    <div>Maximum storage of @generator.MaximumPower units.</div>
+                                    <div>@generator.Cost credits</div>
+                                </div>
+                            }
+                        </div>
+                        <h3>Mount Points</h3>
+                        <div class="row">
+                            @foreach (var mountPoint in option.MountPoints)
+                            {
+                                <div class="col-12 col-md-4 col-lg-3">
+                                    <div class="fw-bold">@mountPoint.Name</div>
+                                    <div>
+                                        @(mountPoint.IsTurret ? "Turret" : "Fixed Mount")
+                                        facing
+                                        @mountPoint.FacingDirection.ToString().ToLower()
+                                    </div>
+                                </div>
+                            }
+                    </div>
+                </div>
+                </div>
+            }
+    </dl>
+    <div asp-validation-summary="All"></div>
+    <button type="submit">Continue</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function selectModel(modelName) {
+            // Reset the class for the previous selection
+            var prevSelectedModel = document.getElementById('modelName').value;
+            var e = document.getElementById('cardHeader-' + prevSelectedModel);
+            if (e) {
+                e.classList.remove('bg-dark')
+                e.classList.remove('text-light')
+                e.classList.remove('border')
+                e.classList.remove('border-black')
+            }
+            document.getElementById('modelName').value = modelName;
+            var e = document.getElementById('cardHeader-' + modelName);
+            if (e) {
+                e.classList.add('bg-dark');
+                e.classList.add('text-light');
+                e.classList.add('border')
+                e.classList.add('border-black')
+            }
+        }
+    </script>
+}
