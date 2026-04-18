@@ -18,7 +18,7 @@ This is an example of a UI for creating an invoice written in Blazor WebAssembly
 
 It's worth noting that this project has no integration with a backend system.
 
-## Razor Ship Builder
+## RazorShipBuilder
 This is a sample project I created to play around with using Razor pages outside of MVC or Blazor. Design a few starships to begin your galactic adventure!
 
 This project also shows use of Entity Framework for DB management and JavaScript for some enhanced interactivity on the editing pages.
