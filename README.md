@@ -12,3 +12,8 @@ This is an implementation of linked lists in C#. It's not functionally any bette
 This is an example of a client for a live online auction built with SignalR. The interface is more functional than pretty, but includes real-time updates on bids and removing items from the list as they close.
 
 Most of the UI is pure JavaScript, so this provides a good example of my coding approach with that language.
+
+## BlazorInvoiceMaker
+This is an example of a UI for creating an invoice written in Blazor WebAssembly. It's pretty straightforward, but is a common use case that I thought was worth including.
+
+It's worth noting that this project has no integration with a backend system.
