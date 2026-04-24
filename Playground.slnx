@@ -4,4 +4,5 @@
   <Project Path="LinkedList/LinkedList.csproj" />
   <Project Path="RazorShipBuilder/RazorShipBuilder.csproj" Id="8ee8f798-788a-4b6c-9fd7-a7b18fff294e" />
   <Project Path="SignalRAuction/SignalRAuction.csproj" Id="607bcf6d-e4a3-4cbe-b432-b3dbd54272e3" />
+  <Project Path="SignalRAuctionTest/SignalRAuctionTest.csproj" Id="79e99ed3-0b3d-4ffc-8b43-4be301bb6702" />
 </Solution>
