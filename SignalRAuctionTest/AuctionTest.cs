@@ -134,6 +134,14 @@ namespace SignalRAuctionTest
             var itemJson = JsonSerializer.Serialize(item);
             var checkItemJson = JsonSerializer.Serialize(checkItem);
             Assert.AreEqual(itemJson, checkItemJson, "Item was changed while attempting to bid after the close time.");
+
+            // Remove the testing item and bidders
+            var deleteResponse = itemService.DeleteItem(item.Id);
+            Assert.IsTrue(deleteResponse, "Received 'false' when deleting the item.");
+            deleteResponse = bidderService.DeleteBidder(bidder1.Id);
+            Assert.IsTrue(deleteResponse, "Received 'false' when deleting the first bidder.");
+            deleteResponse = bidderService.DeleteBidder(bidder2.Id);
+            Assert.IsTrue(deleteResponse, "Received 'false' when deleting the second bidder.");
         }
     }
 }
