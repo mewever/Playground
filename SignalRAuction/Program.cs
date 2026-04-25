@@ -1,7 +1,22 @@
 using SignalRAuction.Hubs;
 using SignalRAuction.Services;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    // CORS allowance for React app on port 3000
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:3000");
+                          policy.AllowAnyHeader();
+                          policy.WithMethods("GET","POST");
+                          policy.AllowCredentials();
+                      });
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -23,6 +38,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 
